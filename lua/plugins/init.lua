@@ -1,5 +1,15 @@
 -- All plugins have lazy=true by default,to load a plugin on startup just lazy=false
 -- List of all default plugins & their definitions
+
+vim.api.nvim_create_augroup("nerdtree_modifiable", { clear = true })
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "nerdtree",
+  callback = function() vim.opt_local.modifiable = true end,
+  group = "nerdtree_modifiable",
+})
+
+
+
 local default_plugins = {
 
   "nvim-lua/plenary.nvim",
@@ -28,6 +38,7 @@ local default_plugins = {
       require("nvterm").setup(opts)
     end,
   },
+  { "scalameta/nvim-metals", config = function() require("user.metals").config() end },
 
   {
     "NvChad/nvim-colorizer.lua",
@@ -253,5 +264,5 @@ local config = require("core.utils").load_config()
 if #config.plugins > 0 then
   table.insert(default_plugins, { import = config.plugins })
 end
-
-require("lazy").setup(default_plugins, config.lazy_nvim)
+local metals = require("plugins.configs.metals") -- returns a table of plugin entries
+require("lazy").setup(vim.list_extend(default_plugins,metals), config.lazy_nvim)
